@@ -19,7 +19,7 @@ create table widgets (
   id bigint primary key,
   name text not null
 );
-select set_default_to_next_duid_block('widgets', 'id');
+select set_default_to_next_duid_block('widgets', 'id', 'widgets_id_seq');
 ```
 
 `set_default_to_next_duid_block` allocates a new 2^32 row block from the ID space, creates a sequence with the appropriate min and max values, and assigns that sequence to the default value of the column. When a block is nearly full this function can be called again to allocate another block to the table.

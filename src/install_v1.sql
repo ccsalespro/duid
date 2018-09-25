@@ -15,35 +15,30 @@ as $$
   insert into duid_blocks(description) values($1) returning id;
 $$ language sql;
 
-create function create_sequence_for_duid_block(int) returns regclass
+create function create_sequence_for_duid_block(int, text) returns void
 as $$
 declare
-  _sequence_name text;
   _minvalue bigint;
   _maxvalue bigint;
 begin
-  _sequence_name := format('duid_block_%s_seq', $1);
   _minvalue := $1::bigint * (1::bigint << 32);
   _maxvalue := (($1::bigint+1) * (1::bigint << 32))-1;
 
   execute format('create sequence %I minvalue %s maxvalue %s',
-    _sequence_name,
+    $2,
     _minvalue,
     _maxvalue
   );
-
-  return _sequence_name::regclass;
 end;
 $$ language plpgsql;
 
-create function set_default_to_next_duid_block(_table regclass, _column text) returns void
+create function set_default_to_next_duid_block(_table regclass, _column text, _sequence_name text) returns void
 as $$
 declare
   _block_id int;
-  _sequence_name regclass;
 begin
   _block_id = allocate_duid_block(format('%I.%I', _table, _column));
-  _sequence_name = create_sequence_for_duid_block(_block_id);
+  perform create_sequence_for_duid_block(_block_id, _sequence_name);
 
   update duid_blocks
   set table_name=_table,
@@ -61,3 +56,12 @@ language sql
 as $$
   select table_name from duid_blocks where id=($1 >> 32);
 $$ ;
+
+---- create above / drop below ----
+
+drop function duid_to_table(bigint);
+drop function set_default_to_next_duid_block(regclass, text, text);
+drop function create_sequence_for_duid_block(int, text);
+drop function allocate_duid_block(text);
+drop table duid_blocks;
+drop table duid_version;
