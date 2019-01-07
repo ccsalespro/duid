@@ -61,5 +61,6 @@ Tests are written in Ruby. To run the tests:
 ```
 createdb duid_test
 psql -f src/install_v1.sql duid_test
+psql -f src/install_v2.sql duid_test
 rake
 ```

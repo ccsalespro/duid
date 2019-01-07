@@ -56,12 +56,3 @@ language sql
 as $$
   select table_name from duid_blocks where id=($1 >> 32);
 $$ ;
-
----- create above / drop below ----
-
-drop function duid_to_table(bigint);
-drop function set_default_to_next_duid_block(regclass, text, text);
-drop function create_sequence_for_duid_block(int, text);
-drop function allocate_duid_block(text);
-drop table duid_blocks;
-drop table duid_version;

@@ -23,7 +23,7 @@ class TestDuid < Minitest::Test
   attr_reader :conn
 
   def test_set_default_to_next_duid_block
-    conn.exec "select set_default_to_next_duid_block('widgets', 'id');"
+    conn.exec "select set_default_to_next_duid_block('widgets', 'id', 'widgets_id_seq');"
 
     conn.exec "insert into widgets(name) values('test') returning id" do |result|
       assert_equal 1, result.num_tuples
@@ -31,7 +31,7 @@ class TestDuid < Minitest::Test
   end
 
   def test_duid_to_table
-    conn.exec "select set_default_to_next_duid_block('widgets', 'id');"
+    conn.exec "select set_default_to_next_duid_block('widgets', 'id', 'widgets_id_seq');"
 
     widget_id = nil
     conn.exec "insert into widgets(name) values('test') returning id" do |result|
